@@ -1,4 +1,6 @@
 const STORAGE_KEY = 'feedback-form-state';
+const formEle = document.querySelector('.feedback-form');
+let formData = new FormData();
 
 function saveToLS(key, value) {
   const valueAsJSON = JSON.stringify(value);
@@ -15,8 +17,6 @@ function getFromLS(key) {
   }
 }
 
-const formEle = document.querySelector('.feedback-form');
-
 function getFormValues(formDataObj) {
   return {
     email: formDataObj.get('email'),
@@ -25,15 +25,17 @@ function getFormValues(formDataObj) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const data = getFromLS(STORAGE_KEY);
-  formEle.elements.email.value = data?.email || '';
-  formEle.elements.message.value = data?.message || '';
+  const savedData = getFromLS(STORAGE_KEY);
+  formData.set('email', savedData?.email || '');
+  formData.set('message', savedData?.message || '');
+  formEle.elements.email.value = formData.get('email');
+  formEle.elements.message.value = formData.get('message');
 });
 
 formEle.addEventListener('submit', e => {
   e.preventDefault();
 
-  let formData = new FormData(formEle);
+  formData = new FormData(formEle);
   const values = getFormValues(formData);
   if (!(values.email && values.message)) {
     alert('Fill please all fields');
@@ -46,7 +48,7 @@ formEle.addEventListener('submit', e => {
 });
 
 formEle.addEventListener('input', () => {
-  const formData = new FormData(formEle);
+  formData = new FormData(formEle);
   const values = getFormValues(formData);
   saveToLS(STORAGE_KEY, values);
 });
